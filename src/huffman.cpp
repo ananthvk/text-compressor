@@ -77,7 +77,7 @@ void HuffmanCode::build_from_bitstring_length(const std::vector<std::pair<int, S
     bits code = {0};
     for (int i = 0; i < symbols.size(); i++)
     {
-        std::cout << symbols[i].second.sym << ": " << code << std::endl;
+        codebook[symbols[i].second] = code;
         if (i == (symbols.size() - 1))
             break;
         code = left_shift(add(code, 1), symbols[i + 1].first - symbols[i].first);
