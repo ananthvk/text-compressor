@@ -31,16 +31,27 @@ struct Node_raw_ptr_compartor
     }
 };
 
-class HuffmanCode
+class HuffmanTree
 {
     std::unique_ptr<Node> root;
 
   public:
-    HuffmanCode() : root(nullptr) {}
+    HuffmanTree() : root(nullptr) {}
 
-    // Builds the Huffman tree with the given symbol count, also returns the root of the
-    // uncanonicalized, unprocessed tree
-    // Note: The returned node does not transfer ownership, the pointer is valid as long as this
-    // object is valid
-    Node *build_from_frequency(const SymbolCountTable &frequency);
+    // Builds a Huffman Tree from the given frequency distribution table
+    void build_from_frequency_table(const SymbolCountTable &frequency);
+
+    // Return a non owning pointer to the root of the tree
+    Node *get_root() const { return root.get(); }
+};
+
+// This class implements a canonical huffman code
+class HuffmanCode
+{
+  public:
+    // Builds a Huffman code from the given huffman tree
+    void build_from_tree(Node *root);
+
+    // Build a huffman code from symbols and their bitstring length
+    void build_from_bitstring_length(const SymbolCountTable &length);
 };

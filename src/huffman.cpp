@@ -22,7 +22,7 @@ void compute_bitstring_lengths(const std::unique_ptr<Node> &root,
     }
 }
 
-Node *HuffmanCode::build_from_frequency(const SymbolCountTable &frequency)
+void HuffmanTree::build_from_frequency_table(const SymbolCountTable &frequency)
 {
     if (frequency.begin() == frequency.end())
     {
@@ -76,6 +76,4 @@ Node *HuffmanCode::build_from_frequency(const SymbolCountTable &frequency)
             break;
         code = left_shift(add(code, 1), symbols[i + 1].first - symbols[i].first);
     }
-
-    return root.get();
 }
