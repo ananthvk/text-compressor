@@ -22,7 +22,7 @@ TEST(HuffmanCodeTest, FromTree)
 TEST(HuffmanCodeTest, CompressionTest)
 {
     std::cout << "Enter text:";
-    std::string s;
+    std::string s = "abcd";
     std::getline(std::cin, s);
     std::map<Symbol, uint64_t> freq;
     for (const auto &ch : s)
@@ -46,6 +46,18 @@ TEST(HuffmanCodeTest, CompressionTest)
 
     std::cout << "Actual size: " << s.size() << std::endl;
     std::cout << "Compressed size: " << compressed.size() << std::endl;
+    std::cout << " ======================== " << std::endl;
+    std::cout << "Codebook: " << std::endl;
+    std::cout << " ======================== " << std::endl;
+    BitStreamReader reader;
+    reader.from_bytes(compressed);
+    auto decompressed = code.decompress(reader, s.size());
+    std::cout << "Decompressed size: " << decompressed.size() << std::endl;
+    std::cout << " ======================== " << std::endl;
+    for(const auto& byte: decompressed){
+        std::cout << (char)byte;
+    }
+    std::cout << std::endl;
     //for (const auto &byte : compressed)
     //{
     //    std::cout << "0x" << std::hex << (int)byte << " ";

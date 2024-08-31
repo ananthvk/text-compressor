@@ -76,6 +76,7 @@ class BitStreamWriter
             stream.push_back(0);
 
         bytes result;
+        result.reserve(stream.size() / 8);
         uint8_t temp_byte = 0;
         for (uint64_t i = 0; i < stream.size(); i++)
         {
@@ -98,4 +99,47 @@ class BitStreamWriter
     }
 
     void clear() { stream.clear(); }
+};
+
+class BitStreamReader
+{
+    bits stream;
+    uint64_t stream_pointer;
+
+  public:
+    BitStreamReader() : stream_pointer(0) {}
+
+    // Returns the bit 0/1 or -1 if read fails
+    int8_t read()
+    {
+        if (stream_pointer == stream.size())
+            return -1;
+        return stream[stream_pointer++];
+    }
+
+    // Reset the stream pointer, does not cause the stream to lose content
+    void reset() { stream_pointer = 0; }
+
+    void clear()
+    {
+        stream.clear();
+        stream_pointer = 0;
+    }
+
+    // Converts the sequence of bytes to a bit stream
+    void from_bytes(const bytes &b)
+    {
+        stream.reserve(b.size() * 8);
+        for (const auto &byte : b)
+        {
+            stream.push_back((byte & 0x80) >> 7);
+            stream.push_back((byte & 0x40) >> 6);
+            stream.push_back((byte & 0x20) >> 5);
+            stream.push_back((byte & 0x10) >> 4);
+            stream.push_back((byte & 0x8) >> 3);
+            stream.push_back((byte & 0x4) >> 2);
+            stream.push_back((byte & 0x2) >> 1);
+            stream.push_back((byte & 0x1));
+        }
+    }
 };

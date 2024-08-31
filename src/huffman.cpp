@@ -77,7 +77,12 @@ void HuffmanCode::build_from_bitstring_length(const std::vector<std::pair<int, S
     bits code = {0};
     for (int i = 0; i < symbols.size(); i++)
     {
-        codebook[symbols[i].second] = code;
+        // Code should be the same length as the bit string length, left pad it with zeros
+        // TODO: Handle case when only single character is inputted
+        bits temp(symbols[i].first - code.size(), 0);
+        temp.reserve(symbols[i].first);
+        temp.insert(temp.end(), code.begin(), code.end());
+        codebook[symbols[i].second] = temp;
         if (i == (symbols.size() - 1))
             break;
         code = left_shift(add(code, 1), symbols[i + 1].first - symbols[i].first);
@@ -92,4 +97,33 @@ void HuffmanCode::compress(Symbol sym, BitStreamWriter &writer) const
         throw std::logic_error("Symbol to compress not present in codebook");
     }
     writer.write(iter->second);
+}
+
+bytes HuffmanCode::decompress(BitStreamReader &reader, uint64_t num_bytes) const
+{
+    int bit;
+    bytes decompressed;
+    bits current;
+
+    // Inefficient solution, just for testing
+    std::map<bits, Symbol> reverse_map;
+    for (const auto &kv : codebook)
+        reverse_map[kv.second] = kv.first;
+
+    while ((bit = reader.read()) != -1)
+    {
+        current.push_back(bit);
+        // Check if this code matches any in the table
+        auto iter = reverse_map.find(current);
+        if (iter != reverse_map.end())
+        {
+            decompressed.push_back(iter->second.sym);
+            current.clear();
+        }
+
+        // If we have processed num_bytes, do not process any more
+        if (decompressed.size() == num_bytes)
+            break;
+    }
+    return decompressed;
 }

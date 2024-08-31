@@ -62,6 +62,8 @@ class HuffmanCode
     void build_from_bitstring_length(const std::vector<std::pair<int, Symbol>> &symbols);
 
     void compress(Symbol sym, BitStreamWriter &writer) const;
+
+    bytes decompress(BitStreamReader& reader, uint64_t num_bytes) const;
     
     void print_codebook(std::ostream& os) const{
         for(const auto& code: codebook){
