@@ -1,6 +1,8 @@
 #pragma once
 #include <ostream>
+#include <stddef.h>
 #include <stdexcept>
+#include <stdint.h>
 #include <vector>
 // This file contains functions related to bit manipulation, bit streams, bit reader and writer
 
@@ -21,7 +23,7 @@ inline bits add(bits l, int bit)
     else if (bit == 1)
     {
         int carry = 1;
-        for (int i = l.size() - 1; i >= 0; i--)
+        for (int i = static_cast<int>(l.size() - 1); i >= 0; i--)
         {
             int sum = l[i] + carry;
             l[i] = sum % 2;
@@ -51,7 +53,7 @@ inline bits left_shift(bits value, int shift)
 
 inline std::ostream &operator<<(std::ostream &os, const bits &b)
 {
-    for(const auto& bitval: b)
+    for (const auto &bitval : b)
         os << bitval;
     return os;
 }

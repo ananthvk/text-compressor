@@ -1,9 +1,9 @@
 #pragma once
 #include "symbol.hpp"
+#include <map>
 #include <memory>
 #include <queue>
 #include <vector>
-
 
 struct Node;
 
@@ -39,7 +39,7 @@ class HuffmanTree
     HuffmanTree() : root(nullptr) {}
 
     // Builds a Huffman Tree from the given frequency distribution table
-    void build_from_frequency_table(const SymbolCountTable &frequency);
+    void build_from_frequency_table(const std::map<Symbol, uint64_t> &frequency);
 
     // Return a non owning pointer to the root of the tree
     Node *get_root() const { return root.get(); }
@@ -48,10 +48,14 @@ class HuffmanTree
 // This class implements a canonical huffman code
 class HuffmanCode
 {
+
+    void compute_bitstring_lengths(Node *root, std::map<Symbol, int> &bitstring_length, int depth);
+
   public:
     // Builds a Huffman code from the given huffman tree
     void build_from_tree(Node *root);
 
-    // Build a huffman code from symbols and their bitstring length
-    void build_from_bitstring_length(const SymbolCountTable &length);
+    // Build a huffman code from symbols and their bitstring length, Note: The vector has to be
+    // sorted
+    void build_from_bitstring_length(const std::vector<std::pair<int, Symbol>> &symbols);
 };

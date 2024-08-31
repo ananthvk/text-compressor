@@ -2,13 +2,11 @@
 #include "bitmanip.hpp"
 #include <algorithm>
 #include <iostream>
-#include <queue>
-#include <stdexcept>
 using std::make_unique;
 using std::unique_ptr;
 
-void compute_bitstring_lengths(const std::unique_ptr<Node> &root,
-                               std::map<Symbol, int> &bitstring_length, int depth)
+void HuffmanCode::compute_bitstring_lengths(Node *root, std::map<Symbol, int> &bitstring_length,
+                                            int depth)
 {
     if (root)
     {
@@ -17,12 +15,12 @@ void compute_bitstring_lengths(const std::unique_ptr<Node> &root,
             bitstring_length[root->sym] = depth;
             return;
         }
-        compute_bitstring_lengths(root->left, bitstring_length, depth + 1);
-        compute_bitstring_lengths(root->right, bitstring_length, depth + 1);
+        compute_bitstring_lengths(root->left.get(), bitstring_length, depth + 1);
+        compute_bitstring_lengths(root->right.get(), bitstring_length, depth + 1);
     }
 }
 
-void HuffmanTree::build_from_frequency_table(const SymbolCountTable &frequency)
+void HuffmanTree::build_from_frequency_table(const std::map<Symbol, uint64_t> &frequency)
 {
     if (frequency.begin() == frequency.end())
     {
@@ -55,7 +53,10 @@ void HuffmanTree::build_from_frequency_table(const SymbolCountTable &frequency)
 
     // The root node is the node left in the priority queue
     root = unique_ptr<Node>(nodes.top());
+}
 
+void HuffmanCode::build_from_tree(Node *root)
+{
     std::map<Symbol, int> bitstring_length;
     compute_bitstring_lengths(root, bitstring_length, 0);
 
@@ -65,8 +66,13 @@ void HuffmanTree::build_from_frequency_table(const SymbolCountTable &frequency)
         // Reverse the order, insert (value, key) pairs into the vector
         symbols.push_back(std::make_pair<>(pair.second, pair.first));
     }
-    std::sort(symbols.begin(), symbols.end());
 
+    std::sort(symbols.begin(), symbols.end());
+    build_from_bitstring_length(symbols);
+}
+
+void HuffmanCode::build_from_bitstring_length(const std::vector<std::pair<int, Symbol>> &symbols)
+{
     // Build the canonical huffman code
     bits code = {0};
     for (int i = 0; i < symbols.size(); i++)
