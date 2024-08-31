@@ -1,4 +1,5 @@
 #pragma once
+#include "bitmanip.hpp"
 #include "symbol.hpp"
 #include <map>
 #include <memory>
@@ -59,4 +60,12 @@ class HuffmanCode
     // Build a huffman code from symbols and their bitstring length, Note: The vector has to be
     // sorted
     void build_from_bitstring_length(const std::vector<std::pair<int, Symbol>> &symbols);
+
+    void compress(Symbol sym, BitStreamWriter &writer) const;
+    
+    void print_codebook(std::ostream& os) const{
+        for(const auto& code: codebook){
+            os << code.first.sym << ": " << code.second << std::endl;
+        }
+    }
 };

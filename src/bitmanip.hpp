@@ -1,6 +1,6 @@
 #pragma once
+#include <cstddef>
 #include <ostream>
-#include <stddef.h>
 #include <stdexcept>
 #include <stdint.h>
 #include <vector>
@@ -8,6 +8,7 @@
 
 
 using bits = std::vector<bool>;
+using bytes = std::vector<uint8_t>;
 
 // If bit is 0, returns l as it is
 // If bit is 1, add the bit to l and return the result
@@ -57,3 +58,44 @@ inline std::ostream &operator<<(std::ostream &os, const bits &b)
         os << bitval;
     return os;
 }
+
+class BitStreamWriter
+{
+    bits stream;
+
+  public:
+    void write(bool bit) { stream.push_back(bit); }
+
+    void write(const bits &b) { stream.insert(stream.end(), b.begin(), b.end()); }
+
+    // Return the stream as bytes, after calling this function, the stream is cleared
+    bytes as_bytes()
+    {
+        // Pad with extra zero bits at the end
+        while (stream.size() % 8 != 0)
+            stream.push_back(0);
+
+        bytes result;
+        uint8_t temp_byte = 0;
+        for (uint64_t i = 0; i < stream.size(); i++)
+        {
+            if (i != 0 && i % 8 == 0)
+            {
+                result.push_back(temp_byte);
+                temp_byte = 0;
+            }
+            temp_byte <<= 1;
+            temp_byte |= stream[i];
+
+            // Check if this is the last byte
+            if ((i + 1) == stream.size())
+            {
+                result.push_back(temp_byte);
+            }
+        }
+        clear();
+        return result;
+    }
+
+    void clear() { stream.clear(); }
+};

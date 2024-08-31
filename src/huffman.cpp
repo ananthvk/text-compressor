@@ -83,3 +83,13 @@ void HuffmanCode::build_from_bitstring_length(const std::vector<std::pair<int, S
         code = left_shift(add(code, 1), symbols[i + 1].first - symbols[i].first);
     }
 }
+
+void HuffmanCode::compress(Symbol sym, BitStreamWriter &writer) const
+{
+    auto iter = codebook.find(sym);
+    if (iter == codebook.end())
+    {
+        throw std::logic_error("Symbol to compress not present in codebook");
+    }
+    writer.write(iter->second);
+}
