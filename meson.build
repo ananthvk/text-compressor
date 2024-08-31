@@ -7,7 +7,7 @@ endif
 
 gtest_dep = dependency('gtest')
 
-tests = ['test_huffman_code_generation']
+tests = ['test_huffman_code_generation', 'test_bit_manipulation']
 include_dirs = ['src']
 
 foreach s : tests
