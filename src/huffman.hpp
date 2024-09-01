@@ -51,9 +51,12 @@ class HuffmanCode
 {
 
     std::map<Symbol, bits> codebook;
-    void compute_bitstring_lengths(Node *root, std::map<Symbol, int> &bitstring_length, int depth);
 
   public:
+
+    // Computes the bitstring length for the given tree, depth should initially be 0
+    void compute_bitstring_lengths(Node *root, std::map<Symbol, int> &bitstring_length, int depth);
+
     // Builds a Huffman code from the given huffman tree
     void build_from_tree(Node *root);
 

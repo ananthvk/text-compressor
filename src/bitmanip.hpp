@@ -143,3 +143,14 @@ class BitStreamReader
         }
     }
 };
+
+inline bytes to_little_endian(uint64_t value)
+{
+    bytes result;
+    for (int i = 0; i < 8; ++i)
+    {
+        result.push_back(static_cast<uint8_t>(value & 0xFF));
+        value >>= 8;
+    }
+    return result;
+}
