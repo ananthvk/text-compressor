@@ -19,15 +19,13 @@ TEST(HuffmanCodeTest, FromTree)
     code.build_from_tree(tree.get_root());
 }
 
-TEST(HuffmanCodeTest, CompressionTest)
+// Tests that after decompression, it is equal to the original byte sequence
+void test_compression_and_decompression(const bytes &s)
 {
-    std::cout << "Enter text:";
-    std::string s = "abcd";
-    std::getline(std::cin, s);
     std::map<Symbol, uint64_t> freq;
     for (const auto &ch : s)
     {
-        ++freq[{static_cast<unsigned char>(ch)}];
+        ++freq[{ch}];
     }
 
     HuffmanTree tree;
@@ -44,25 +42,58 @@ TEST(HuffmanCodeTest, CompressionTest)
 
     auto compressed = writer.as_bytes();
 
-    std::cout << "Actual size: " << s.size() << std::endl;
-    std::cout << "Compressed size: " << compressed.size() << std::endl;
-    std::cout << " ======================== " << std::endl;
-    std::cout << "Codebook: " << std::endl;
-    std::cout << " ======================== " << std::endl;
     BitStreamReader reader;
     reader.from_bytes(compressed);
     auto decompressed = code.decompress(reader, s.size());
-    std::cout << "Decompressed size: " << decompressed.size() << std::endl;
-    std::cout << " ======================== " << std::endl;
-    for(const auto& byte: decompressed){
-        std::cout << (char)byte;
-    }
-    std::cout << std::endl;
-    //for (const auto &byte : compressed)
-    //{
-    //    std::cout << "0x" << std::hex << (int)byte << " ";
-    //}
-    //std::cout << std::endl;
+
+    ASSERT_EQ(s, decompressed);
+}
+
+TEST(HuffmanCodeTest, CompresionAndDecompression)
+{
+    // Single byte tests
+    test_compression_and_decompression({65});
+    test_compression_and_decompression({0});
+    test_compression_and_decompression({128});
+    test_compression_and_decompression({255});
+
+    // Two bytes
+    test_compression_and_decompression({0, 3});
+    test_compression_and_decompression({3, 0});
+    test_compression_and_decompression({1, 1});
+    test_compression_and_decompression({0, 0});
+    test_compression_and_decompression({65, 65});
+
+    // Three bytes
+    test_compression_and_decompression({0, 0, 0});
+    test_compression_and_decompression({0, 0, 1});
+    test_compression_and_decompression({0, 1, 0});
+    test_compression_and_decompression({0, 1, 1});
+    test_compression_and_decompression({1, 0, 0});
+    test_compression_and_decompression({1, 0, 1});
+    test_compression_and_decompression({1, 1, 0});
+    test_compression_and_decompression({1, 1, 1});
+
+    // Repeated bytes
+    test_compression_and_decompression(bytes(100, 65));
+    test_compression_and_decompression(bytes(1000, 1));
+
+    // Random strings
+    test_compression_and_decompression({'T', 'h', 'e', ' ', 'q', 'u', 'i', 'c', 'k', ' ', 'b',
+                                        'r', 'o', 'w', 'n', ' ', 'f', 'o', 'x', ' ', 'j', 'u',
+                                        'm', 'p', 's', ' ', 'o', 'v', 'e', 'r', ' ', 't', 'h',
+                                        'e', ' ', 'l', 'a', 'z', 'y', ' ', 'd', 'o', 'g', 's'});
+
+    // All unique bytes
+    test_compression_and_decompression({'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'});
+    bytes b;
+    for (int i = 0; i < 256; i++)
+        b.push_back(static_cast<uint8_t>(i));
+    test_compression_and_decompression(b);
+
+    for (int i = 0; i < 256; i++)
+        b.push_back(static_cast<uint8_t>(i));
+    test_compression_and_decompression(b);
 }
 
 int main(int argc, char *argv[])

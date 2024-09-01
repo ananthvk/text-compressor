@@ -64,7 +64,12 @@ void HuffmanCode::build_from_tree(Node *root)
     for (const auto &pair : bitstring_length)
     {
         // Reverse the order, insert (value, key) pairs into the vector
-        symbols.push_back(std::make_pair<>(pair.second, pair.first));
+
+        // Edge case when there is only a single character
+        if (pair.second == 0)
+            symbols.push_back(std::make_pair<>(1, pair.first));
+        else
+            symbols.push_back(std::make_pair<>(pair.second, pair.first));
     }
 
     std::sort(symbols.begin(), symbols.end());
@@ -78,7 +83,6 @@ void HuffmanCode::build_from_bitstring_length(const std::vector<std::pair<int, S
     for (int i = 0; i < symbols.size(); i++)
     {
         // Code should be the same length as the bit string length, left pad it with zeros
-        // TODO: Handle case when only single character is inputted
         bits temp(symbols[i].first - code.size(), 0);
         temp.reserve(symbols[i].first);
         temp.insert(temp.end(), code.begin(), code.end());
@@ -105,7 +109,7 @@ bytes HuffmanCode::decompress(BitStreamReader &reader, uint64_t num_bytes) const
     bytes decompressed;
     bits current;
 
-    // Inefficient solution, just for testing
+    // Inefficient solution, implement a better solution later
     std::map<bits, Symbol> reverse_map;
     for (const auto &kv : codebook)
         reverse_map[kv.second] = kv.first;
