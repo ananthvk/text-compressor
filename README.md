@@ -41,6 +41,7 @@ Note: Offsets are with respect to the start of the block and not with respect to
 |----|------|--------------|-----|--------|
 |Block type|0|1|Identifies the block type|For future use(i.e. to store uncompressible blocks directly)|
 |Uncompressed size|1|8|Size of the uncompressed data(unsigned)|-|
+|Compressed size|1|8|Size of the compressed data(unsigned)|-|
 |Frequency table|9|256|Number of bits for each symbol|H[i] represents number of bits for byte with value i|
 |Compressed data|-|Variable length|-|-
 

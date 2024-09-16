@@ -31,6 +31,10 @@ bytes HuffmanArchiver::compress(bytes::const_iterator beg, const bytes::const_it
     // Write the size of uncompressed data (as little endian)
     bytes temp = to_little_endian(end - beg);
     header.insert(header.end(), temp.begin(), temp.end());
+    
+    // Write the size of compressed data (as little endian)
+    temp = to_little_endian(compressed_data.size());
+    header.insert(header.end(), temp.begin(), temp.end());
 
     // Write the bitstring length table of size 256 bytes
     std::map<Symbol, int> bitstring_length;

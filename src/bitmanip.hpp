@@ -101,6 +101,7 @@ class BitStreamWriter
     void clear() { stream.clear(); }
 };
 
+// TODO: Use an iterator, instead of expanding all bits of every byte
 class BitStreamReader
 {
     bits stream;
@@ -132,15 +133,20 @@ class BitStreamReader
         stream.reserve(b.size() * 8);
         for (const auto &byte : b)
         {
-            stream.push_back((byte & 0x80) >> 7);
-            stream.push_back((byte & 0x40) >> 6);
-            stream.push_back((byte & 0x20) >> 5);
-            stream.push_back((byte & 0x10) >> 4);
-            stream.push_back((byte & 0x8) >> 3);
-            stream.push_back((byte & 0x4) >> 2);
-            stream.push_back((byte & 0x2) >> 1);
-            stream.push_back((byte & 0x1));
+            from_byte(byte);
         }
+    }
+
+    void from_byte(uint8_t byte)
+    {
+        stream.push_back((byte & 0x80) >> 7);
+        stream.push_back((byte & 0x40) >> 6);
+        stream.push_back((byte & 0x20) >> 5);
+        stream.push_back((byte & 0x10) >> 4);
+        stream.push_back((byte & 0x8) >> 3);
+        stream.push_back((byte & 0x4) >> 2);
+        stream.push_back((byte & 0x2) >> 1);
+        stream.push_back((byte & 0x1));
     }
 };
 
@@ -152,5 +158,21 @@ inline bytes to_little_endian(uint64_t value)
         result.push_back(static_cast<uint8_t>(value & 0xFF));
         value >>= 8;
     }
+    return result;
+}
+
+inline uint64_t from_little_endian_to_uint64_t(const std::vector<uint8_t> &vec)
+{
+    if (vec.size() != 8)
+    {
+        throw std::invalid_argument("vec must be of size 8");
+    }
+
+    uint64_t result = 0;
+    for (int i = 0; i < 8; ++i)
+    {
+        result |= static_cast<uint64_t>(vec[i]) << (i * 8);
+    }
+
     return result;
 }
